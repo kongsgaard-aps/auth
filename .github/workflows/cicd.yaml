@@ -1,0 +1,37 @@
+name: Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Push Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log Into Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ghcr.io/ocni-dtu/auth
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Image
+        run: docker build -t ghcr.io/ocni-dtu/auth:latest .
+
+      - name: Push Image
+        if: github.event_name != 'pull_request'
+        run: docker push ghcr.io/ocni-dtu/auth:latest
