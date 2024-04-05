@@ -8,6 +8,7 @@ from supertokens_python.framework.request import BaseRequest
 from supertokens_python.recipe import emailpassword, session, dashboard, userroles, usermetadata
 from supertokens_python.recipe.userroles.asyncio import create_new_role_or_add_permissions, get_all_roles
 
+from routes.stripe import router as stripe_router
 from settings import settings
 
 if "test" not in settings.SERVER_NAME.lower():
@@ -71,6 +72,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(stripe_router, prefix=settings.API_STR)
 
 
 @app.on_event("startup")
